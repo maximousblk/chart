@@ -1,4 +1,4 @@
-# asciichart
+# chart
 
 Console ASCII line charts with no dependencies.
 
