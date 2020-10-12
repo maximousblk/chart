@@ -2,7 +2,7 @@ name: Test
 
 on:
   push:
-  pull_request:
+  pull_request_target:
   schedule:
     - cron: '0 0 * * *'
 
@@ -21,7 +21,7 @@ jobs:
       - name: Setup Deno
         uses: denolib/setup-deno@v2
         with:
-          deno-version: ${{ matrix.deno }} # tests across multiple Deno versions
+          deno-version: ${{ matrix.deno }}
 
       - name: Run Tests
-        run: deno test -A --unstable
+        run: deno test
