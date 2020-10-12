@@ -2,7 +2,7 @@
 
 Console ASCII line charts with no dependencies.
 
-This is a port of the npm package `asciichart` by [Igor Kroitor](https://github.com/kroitor)
+This is a port of the npm package [`asciichart`](https://www.npmjs.com/package/asciichart) by [Igor Kroitor](https://github.com/kroitor)
 
 <img width="700" alt="Console ASCII Line charts in pure Javascript (for NodeJS and browsers)" src="https://cloud.githubusercontent.com/assets/1294454/22818709/9f14e1c2-ef7f-11e6-978f-34b5b595fb63.png">
 
