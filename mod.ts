@@ -1,17 +1,37 @@
+type color =
+  | "black"
+  | "red"
+  | "green"
+  | "yellow"
+  | "blue"
+  | "magenta"
+  | "cyan"
+  | "lightgray"
+  | "base"
+  | "darkgray"
+  | "lightred"
+  | "lightgreen"
+  | "lightyellow"
+  | "lightblue"
+  | "lightmagenta"
+  | "lightcyan"
+  | "white"
+  | "reset";
+
 export interface config {
-  min?: number,
-  max?: number,
-  offset?: number,
-  padding?: string,
-  height?: number,
-  colors?: string[],
-  symbols?: string[]
-  format?: any
+  min?: number;
+  max?: number;
+  offset?: number;
+  padding?: string;
+  height?: number;
+  colors?: color[];
+  symbols?: string[];
+  format?: any;
 }
 
 // control sequences for coloring
 
-export const colors: { [key: string]: string; } = {
+export const colors: { [key: string]: string } = {
   black: "\x1b[30m",
   red: "\x1b[31m",
   green: "\x1b[32m",
@@ -30,12 +50,12 @@ export const colors: { [key: string]: string; } = {
   lightcyan: "\x1b[96m",
   white: "\x1b[97m",
   reset: "\x1b[0m",
-}
+};
 
 export const colored = (char: string, color: string) => {
   // do not color it if color is not specified
   return color === undefined ? char : colors[color] + char + colors.reset;
-}
+};
 
 export const plot = (series: any, cfg: config = {}) => {
   // this function takes both one array and array of arrays
@@ -65,12 +85,15 @@ export const plot = (series: any, cfg: config = {}) => {
   let rows = Math.abs(max2 - min2);
   let width = 0;
 
-  for (let i = 0; i < series.length; i++) width = Math.max(width, series[i].length);
+  for (let i = 0; i < series.length; i++) {
+    width = Math.max(width, series[i].length);
+  }
 
   width += offset;
 
   let symbols = cfg.symbols ?? defaultSymbols;
-  let format = cfg.format ?? ((x: number) => (padding + x.toFixed(2)).slice(-padding.length));
+  let format = cfg.format ??
+    ((x: number) => (padding + x.toFixed(2)).slice(-padding.length));
 
   let result = new Array(rows + 1); // empty space
 
@@ -85,7 +108,7 @@ export const plot = (series: any, cfg: config = {}) => {
     // axis + labels
     let label = format(
       rows > 0 ? max - ((y - min2) * range) / rows : y,
-      y - min2
+      y - min2,
     );
 
     result[y - min2][Math.max(offset - label.length, 0)] = label;
@@ -108,12 +131,12 @@ export const plot = (series: any, cfg: config = {}) => {
       } else {
         result[rows - y1][x + offset] = colored(
           y0 > y1 ? symbols[5] : symbols[6],
-          currentColor
+          currentColor,
         );
 
         result[rows - y0][x + offset] = colored(
           y0 > y1 ? symbols[7] : symbols[8],
-          currentColor
+          currentColor,
         );
 
         let from = Math.min(y0, y1);
@@ -128,4 +151,3 @@ export const plot = (series: any, cfg: config = {}) => {
 
   return result.map((x) => x.join("")).join("\n");
 };
-
