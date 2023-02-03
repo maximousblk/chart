@@ -26,7 +26,7 @@ export interface config {
   height?: number;
   colors?: color[];
   symbols?: string[];
-  format?: any;
+  format?: (x: number, i?: number) => string;
 }
 
 // control sequences for coloring
@@ -57,11 +57,15 @@ export const colored = (char: string, color: string) => {
   return color === undefined ? char : colors[color] + char + colors.reset;
 };
 
-export const plot = (series: any, cfg: config = {}) => {
+export const plot = (series: number[] | number[][], cfg: config = {}) => {
   // this function takes both one array and array of arrays
   // if an array of numbers is passed it is transformed to
   // an array of exactly one array with numbers
-  if (typeof series[0] == "number") series = [series];
+  if (typeof series[0] == "number") {
+    series = [series as number[]];
+  } else {
+    series = series as number[][];
+  }
 
   let min = cfg.min ?? series[0][0];
   let max = cfg.max ?? series[0][0];
@@ -73,16 +77,16 @@ export const plot = (series: any, cfg: config = {}) => {
     }
   }
 
-  let defaultSymbols = ["┼", "┤", "╶", "╴", "─", "╰", "╭", "╮", "╯", "│"];
-  let range = Math.abs(max - min);
-  let offset = cfg.offset ?? 3;
-  let padding = cfg.padding ?? "           ";
-  let height = cfg.height ?? range;
-  let colors = cfg.colors ?? [];
-  let ratio = range !== 0 ? height / range : 1;
-  let min2 = Math.round(min * ratio);
-  let max2 = Math.round(max * ratio);
-  let rows = Math.abs(max2 - min2);
+  const defaultSymbols = ["┼", "┤", "╶", "╴", "─", "╰", "╭", "╮", "╯", "│"];
+  const range = Math.abs(max - min);
+  const offset = cfg.offset ?? 3;
+  const padding = cfg.padding ?? "           ";
+  const height = cfg.height ?? range;
+  const colors = cfg.colors ?? [];
+  const ratio = range !== 0 ? height / range : 1;
+  const min2 = Math.round(min * ratio);
+  const max2 = Math.round(max * ratio);
+  const rows = Math.abs(max2 - min2);
   let width = 0;
 
   for (let i = 0; i < series.length; i++) {
@@ -91,11 +95,11 @@ export const plot = (series: any, cfg: config = {}) => {
 
   width += offset;
 
-  let symbols = cfg.symbols ?? defaultSymbols;
-  let format = cfg.format ??
+  const symbols = cfg.symbols ?? defaultSymbols;
+  const format = cfg.format ??
     ((x: number) => (padding + x.toFixed(2)).slice(-padding.length));
 
-  let result = new Array(rows + 1); // empty space
+  const result = new Array(rows + 1); // empty space
 
   for (let i = 0; i <= rows; i++) {
     result[i] = new Array(width);
@@ -106,7 +110,7 @@ export const plot = (series: any, cfg: config = {}) => {
 
   for (let y = min2; y <= max2; ++y) {
     // axis + labels
-    let label = format(
+    const label = format(
       rows > 0 ? max - ((y - min2) * range) / rows : y,
       y - min2,
     );
@@ -116,15 +120,15 @@ export const plot = (series: any, cfg: config = {}) => {
   }
 
   for (let j = 0; j < series.length; j++) {
-    let currentColor = colors[j % colors.length];
-    let y0 = Math.round(series[j][0] * ratio) - min2;
+    const currentColor = colors[j % colors.length];
+    const y0 = Math.round(series[j][0] * ratio) - min2;
 
     result[rows - y0][offset - 1] = colored(symbols[0], currentColor); // first value
 
     for (let x = 0; x < series[j].length - 1; x++) {
       // plot the line
-      let y0 = Math.round(series[j][x + 0] * ratio) - min2;
-      let y1 = Math.round(series[j][x + 1] * ratio) - min2;
+      const y0 = Math.round(series[j][x + 0] * ratio) - min2;
+      const y1 = Math.round(series[j][x + 1] * ratio) - min2;
 
       if (y0 == y1) {
         result[rows - y0][x + offset] = colored(symbols[4], currentColor);
@@ -139,8 +143,8 @@ export const plot = (series: any, cfg: config = {}) => {
           currentColor,
         );
 
-        let from = Math.min(y0, y1);
-        let to = Math.max(y0, y1);
+        const from = Math.min(y0, y1);
+        const to = Math.max(y0, y1);
 
         for (let y = from + 1; y < to; y++) {
           result[rows - y][x + offset] = colored(symbols[9], currentColor);
